@@ -1,0 +1,34 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: vehicle-management-hbase
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 3s
+
+# 你的 PD 虚拟机：10.211.55.3
+hbase:
+  zookeeper-quorum: ${VM_HOST:10.211.55.3}
+  zookeeper-client-port: ${ZK_PORT:2181}
+  table-users: users
+  table-vehicles: vehicles
+  table-audit: vehicle_audit
+
+hdfs:
+  uri: hdfs://${VM_HOST:10.211.55.3}:${HDFS_PORT:9000}
+  user: ${HDFS_USER:hadoop}
+  stats-dir: /vehicle-management/stats
+
+jwt:
+  issuer: vehicle-management
+  # 建议在生产环境通过环境变量传入高强度密钥（至少32字符）
+  secret: ${JWT_SECRET:ReplaceWithAtLeast32CharsSecretKey12345}
+  expire-seconds: ${JWT_EXPIRE_SECONDS:7200}
+
+security:
+  token-prefix: 'login:token'
