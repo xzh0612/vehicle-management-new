@@ -13,6 +13,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -54,6 +55,7 @@ public class HBaseAuditRepository implements AuditRepository {
             put.addColumn(CF, Bytes.toBytes("vehicleId"), Bytes.toBytes(record.getVehicleId()));
             put.addColumn(CF, Bytes.toBytes("operation"), Bytes.toBytes(record.getOperation()));
             put.addColumn(CF, Bytes.toBytes("operator"), Bytes.toBytes(record.getOperator()));
+            put.addColumn(CF, Bytes.toBytes("detail"), Bytes.toBytes(record.getDetail() == null ? "" : record.getDetail()));
             put.addColumn(CF, Bytes.toBytes("timestamp"), Bytes.toBytes(record.getTimestamp()));
             table.put(put);
         }
@@ -76,16 +78,46 @@ public class HBaseAuditRepository implements AuditRepository {
                     continue;
                 }
                 AuditRecord record = new AuditRecord();
-                record.setRecordId(Bytes.toString(result.getValue(CF, Bytes.toBytes("recordId"))));
+                record.setRecordId(stringValue(result, "recordId", Bytes.toString(result.getRow())));
                 record.setVehicleId(currentVehicleId);
-                record.setOperation(Bytes.toString(result.getValue(CF, Bytes.toBytes("operation"))));
-                record.setOperator(Bytes.toString(result.getValue(CF, Bytes.toBytes("operator"))));
+                record.setOperation(stringValue(result, "operation", stringValue(result, "action", "UNKNOWN")));
+                record.setOperator(stringValue(result, "operator", ""));
+                record.setDetail(stringValue(result, "detail", ""));
                 byte[] ts = result.getValue(CF, Bytes.toBytes("timestamp"));
-                record.setTimestamp(ts == null ? 0L : Bytes.toLong(ts));
+                record.setTimestamp(parseTimestamp(ts));
                 records.add(record);
             }
             records.sort(Comparator.comparingLong(AuditRecord::getTimestamp).reversed());
             return records;
+        }
+    }
+
+    private String stringValue(Result result, String qualifier, String fallback) {
+        byte[] value = result.getValue(CF, Bytes.toBytes(qualifier));
+        String text = Bytes.toString(value);
+        return text == null || text.isBlank() ? fallback : text;
+    }
+
+    private long parseTimestamp(byte[] value) {
+        if (value == null) {
+            return 0L;
+        }
+        try {
+            return Bytes.toLong(value);
+        } catch (Exception ignored) {
+            String text = Bytes.toString(value);
+            if (text == null || text.isBlank()) {
+                return 0L;
+            }
+            try {
+                return Long.parseLong(text);
+            } catch (Exception ignoredAgain) {
+                try {
+                    return Instant.parse(text).toEpochMilli();
+                } catch (Exception ignoredThird) {
+                    return 0L;
+                }
+            }
         }
     }
 }

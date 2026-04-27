@@ -54,11 +54,19 @@ public class HBaseVehicleRepository implements VehicleRepository {
             Put put = new Put(Bytes.toBytes(vehicle.getVehicleId()));
             put.addColumn(CF, Bytes.toBytes("vehicleId"), Bytes.toBytes(vehicle.getVehicleId()));
             put.addColumn(CF, Bytes.toBytes("plateNumber"), Bytes.toBytes(vehicle.getPlateNumber()));
+            put.addColumn(CF, Bytes.toBytes("vin"), Bytes.toBytes(nullToEmpty(vehicle.getVin())));
+            put.addColumn(CF, Bytes.toBytes("engineNumber"), Bytes.toBytes(nullToEmpty(vehicle.getEngineNumber())));
             put.addColumn(CF, Bytes.toBytes("brand"), Bytes.toBytes(vehicle.getBrand()));
             put.addColumn(CF, Bytes.toBytes("model"), Bytes.toBytes(vehicle.getModel()));
             put.addColumn(CF, Bytes.toBytes("ownerName"), Bytes.toBytes(vehicle.getOwnerName()));
             put.addColumn(CF, Bytes.toBytes("phone"), Bytes.toBytes(vehicle.getPhone()));
             put.addColumn(CF, Bytes.toBytes("status"), Bytes.toBytes(vehicle.getStatus()));
+            put.addColumn(CF, Bytes.toBytes("registerDate"), Bytes.toBytes(nullToEmpty(vehicle.getRegisterDate())));
+            put.addColumn(CF, Bytes.toBytes("annualInspectionDate"), Bytes.toBytes(nullToEmpty(vehicle.getAnnualInspectionDate())));
+            put.addColumn(CF, Bytes.toBytes("insuranceExpireDate"), Bytes.toBytes(nullToEmpty(vehicle.getInsuranceExpireDate())));
+            put.addColumn(CF, Bytes.toBytes("mileage"), Bytes.toBytes(vehicle.getMileage()));
+            put.addColumn(CF, Bytes.toBytes("remark"), Bytes.toBytes(nullToEmpty(vehicle.getRemark())));
+            put.addColumn(CF, Bytes.toBytes("createdBy"), Bytes.toBytes(nullToEmpty(vehicle.getCreatedBy())));
             put.addColumn(CF, Bytes.toBytes("createdAt"), Bytes.toBytes(vehicle.getCreatedAt()));
             put.addColumn(CF, Bytes.toBytes("updatedAt"), Bytes.toBytes(vehicle.getUpdatedAt()));
             table.put(put);
@@ -135,6 +143,20 @@ public class HBaseVehicleRepository implements VehicleRepository {
         return filtered;
     }
 
+    @Override
+    public Optional<Vehicle> findByPlateNumber(String plateNumber) throws IOException {
+        return findAll().stream()
+                .filter(vehicle -> plateNumber.equalsIgnoreCase(vehicle.getPlateNumber()))
+                .findFirst();
+    }
+
+    @Override
+    public Optional<Vehicle> findByVin(String vin) throws IOException {
+        return findAll().stream()
+                .filter(vehicle -> vin.equalsIgnoreCase(vehicle.getVin()))
+                .findFirst();
+    }
+
     /**
      * 根据车辆ID删除车辆
      * @param vehicleId 车辆ID
@@ -154,18 +176,52 @@ public class HBaseVehicleRepository implements VehicleRepository {
      */
     private Vehicle resultToVehicle(Result result) {
         Vehicle vehicle = new Vehicle();
-        vehicle.setVehicleId(Bytes.toString(result.getValue(CF, Bytes.toBytes("vehicleId"))));
-        vehicle.setPlateNumber(Bytes.toString(result.getValue(CF, Bytes.toBytes("plateNumber"))));
-        vehicle.setBrand(Bytes.toString(result.getValue(CF, Bytes.toBytes("brand"))));
-        vehicle.setModel(Bytes.toString(result.getValue(CF, Bytes.toBytes("model"))));
-        vehicle.setOwnerName(Bytes.toString(result.getValue(CF, Bytes.toBytes("ownerName"))));
-        vehicle.setPhone(Bytes.toString(result.getValue(CF, Bytes.toBytes("phone"))));
-        vehicle.setStatus(Bytes.toString(result.getValue(CF, Bytes.toBytes("status"))));
+        vehicle.setVehicleId(stringValue(result, "vehicleId", Bytes.toString(result.getRow())));
+        vehicle.setPlateNumber(stringValue(result, "plateNumber", ""));
+        vehicle.setVin(stringValue(result, "vin", ""));
+        vehicle.setEngineNumber(stringValue(result, "engineNumber", ""));
+        vehicle.setBrand(stringValue(result, "brand", ""));
+        vehicle.setModel(stringValue(result, "model", ""));
+        vehicle.setOwnerName(stringValue(result, "ownerName", ""));
+        vehicle.setPhone(stringValue(result, "phone", ""));
+        vehicle.setStatus(stringValue(result, "status", "ACTIVE"));
+        vehicle.setRegisterDate(stringValue(result, "registerDate", ""));
+        vehicle.setAnnualInspectionDate(stringValue(result, "annualInspectionDate", ""));
+        vehicle.setInsuranceExpireDate(stringValue(result, "insuranceExpireDate", ""));
+        vehicle.setRemark(stringValue(result, "remark", ""));
+        vehicle.setCreatedBy(stringValue(result, "createdBy", ""));
 
+        byte[] mileage = result.getValue(CF, Bytes.toBytes("mileage"));
         byte[] createdAt = result.getValue(CF, Bytes.toBytes("createdAt"));
         byte[] updatedAt = result.getValue(CF, Bytes.toBytes("updatedAt"));
-        vehicle.setCreatedAt(createdAt == null ? 0L : Bytes.toLong(createdAt));
-        vehicle.setUpdatedAt(updatedAt == null ? 0L : Bytes.toLong(updatedAt));
+        vehicle.setMileage(longValue(mileage, 0L));
+        vehicle.setCreatedAt(longValue(createdAt, 0L));
+        vehicle.setUpdatedAt(longValue(updatedAt, 0L));
         return vehicle;
+    }
+
+    private String nullToEmpty(String value) {
+        return value == null ? "" : value;
+    }
+
+    private String stringValue(Result result, String qualifier, String fallback) {
+        byte[] value = result.getValue(CF, Bytes.toBytes(qualifier));
+        String text = Bytes.toString(value);
+        return text == null || text.isBlank() ? fallback : text;
+    }
+
+    private long longValue(byte[] value, long fallback) {
+        if (value == null) {
+            return fallback;
+        }
+        try {
+            return Bytes.toLong(value);
+        } catch (Exception ignored) {
+            try {
+                return Long.parseLong(Bytes.toString(value));
+            } catch (Exception ignoredAgain) {
+                return fallback;
+            }
+        }
     }
 }

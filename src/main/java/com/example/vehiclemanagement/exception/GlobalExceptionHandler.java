@@ -79,7 +79,9 @@ public class GlobalExceptionHandler {
     private ResponseEntity<Map<String, Object>> build(HttpStatus status, String message) {
         Map<String, Object> body = new HashMap<>();
         body.put("code", status.value());
+        body.put("success", false);
         body.put("message", message);
+        body.put("data", null);
         return ResponseEntity.status(status).body(body);
     }
 }

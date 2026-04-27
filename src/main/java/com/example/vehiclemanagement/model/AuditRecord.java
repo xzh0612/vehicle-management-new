@@ -13,6 +13,8 @@ public class AuditRecord {
     private String operation;
     /** 操作人 */
     private String operator;
+    /** 操作详情 */
+    private String detail;
     /** 操作时间戳 */
     private long timestamp;
 
@@ -78,6 +80,14 @@ public class AuditRecord {
      */
     public void setOperator(String operator) {
         this.operator = operator;
+    }
+
+    public String getDetail() {
+        return detail;
+    }
+
+    public void setDetail(String detail) {
+        this.detail = detail;
     }
 
     /**

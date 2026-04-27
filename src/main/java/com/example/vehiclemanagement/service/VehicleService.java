@@ -1,5 +1,7 @@
 package com.example.vehiclemanagement.service;
 
+import com.example.vehiclemanagement.dto.PageResponse;
+import com.example.vehiclemanagement.dto.VehicleQueryRequest;
 import com.example.vehiclemanagement.dto.VehicleRequest;
 import com.example.vehiclemanagement.model.AuditRecord;
 import com.example.vehiclemanagement.model.Vehicle;
@@ -47,7 +49,7 @@ public interface VehicleService {
      * @param status 状态（可选）
      * @return 车辆列表
      */
-    List<Vehicle> list(String brand, String status);
+    PageResponse<Vehicle> list(VehicleQueryRequest request);
 
     /**
      * 查询车辆审计日志

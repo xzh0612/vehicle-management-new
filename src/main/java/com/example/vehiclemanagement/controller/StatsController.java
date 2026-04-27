@@ -1,5 +1,6 @@
 package com.example.vehiclemanagement.controller;
 
+import com.example.vehiclemanagement.dto.ApiResponse;
 import com.example.vehiclemanagement.service.AuthService;
 import com.example.vehiclemanagement.service.StatsService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,9 +37,9 @@ public class StatsController {
      * @return 统计结果
      */
     @GetMapping
-    public Map<String, Object> stats(@RequestHeader("Authorization") String authorization) {
+    public ApiResponse<Map<String, Object>> stats(@RequestHeader("Authorization") String authorization) {
         authService.requireUser(authorization);
-        return statsService.generateStats();
+        return ApiResponse.success(statsService.generateStats());
     }
 
     /**
@@ -47,9 +48,9 @@ public class StatsController {
      * @return HDFS 存储路径
      */
     @PostMapping("/upload")
-    public Map<String, String> upload(@RequestHeader("Authorization") String authorization) {
+    public ApiResponse<Map<String, String>> upload(@RequestHeader("Authorization") String authorization) {
         authService.requireAdmin(authorization);
         String path = statsService.uploadStatsToHdfs();
-        return Map.of("hdfsPath", path);
+        return ApiResponse.success(Map.of("hdfsPath", path), "统计已上传到 HDFS");
     }
 }

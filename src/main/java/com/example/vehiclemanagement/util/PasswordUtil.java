@@ -29,4 +29,18 @@ public final class PasswordUtil {
             throw new IllegalStateException("SHA-256 not available", e);
         }
     }
+
+    /**
+     * 校验存储密码与明文密码是否匹配。
+     * 兼容历史明文存储和当前 SHA-256 哈希存储。
+     * @param storedPassword HBase 中存储的密码
+     * @param rawPassword 用户输入的明文密码
+     * @return 是否匹配
+     */
+    public static boolean matchesStoredPassword(String storedPassword, String rawPassword) {
+        if (storedPassword == null || rawPassword == null) {
+            return false;
+        }
+        return storedPassword.equals(rawPassword) || storedPassword.equals(sha256(rawPassword));
+    }
 }

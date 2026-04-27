@@ -9,6 +9,10 @@ public class Vehicle {
     private String vehicleId;
     /** 车牌号 */
     private String plateNumber;
+    /** 车架号 */
+    private String vin;
+    /** 发动机号 */
+    private String engineNumber;
     /** 品牌 */
     private String brand;
     /** 型号 */
@@ -19,6 +23,18 @@ public class Vehicle {
     private String phone;
     /** 状态 */
     private String status;
+    /** 首次登记日期 */
+    private String registerDate;
+    /** 年检到期日期 */
+    private String annualInspectionDate;
+    /** 保险到期日期 */
+    private String insuranceExpireDate;
+    /** 里程数 */
+    private long mileage;
+    /** 备注 */
+    private String remark;
+    /** 创建人 */
+    private String createdBy;
     /** 创建时间戳 */
     private long createdAt;
     /** 更新时间戳 */
@@ -54,6 +70,22 @@ public class Vehicle {
      */
     public void setPlateNumber(String plateNumber) {
         this.plateNumber = plateNumber;
+    }
+
+    public String getVin() {
+        return vin;
+    }
+
+    public void setVin(String vin) {
+        this.vin = vin;
+    }
+
+    public String getEngineNumber() {
+        return engineNumber;
+    }
+
+    public void setEngineNumber(String engineNumber) {
+        this.engineNumber = engineNumber;
     }
 
     /**
@@ -134,6 +166,54 @@ public class Vehicle {
      */
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getRegisterDate() {
+        return registerDate;
+    }
+
+    public void setRegisterDate(String registerDate) {
+        this.registerDate = registerDate;
+    }
+
+    public String getAnnualInspectionDate() {
+        return annualInspectionDate;
+    }
+
+    public void setAnnualInspectionDate(String annualInspectionDate) {
+        this.annualInspectionDate = annualInspectionDate;
+    }
+
+    public String getInsuranceExpireDate() {
+        return insuranceExpireDate;
+    }
+
+    public void setInsuranceExpireDate(String insuranceExpireDate) {
+        this.insuranceExpireDate = insuranceExpireDate;
+    }
+
+    public long getMileage() {
+        return mileage;
+    }
+
+    public void setMileage(long mileage) {
+        this.mileage = mileage;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
     /**

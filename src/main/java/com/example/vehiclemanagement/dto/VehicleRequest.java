@@ -1,6 +1,10 @@
 package com.example.vehiclemanagement.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 
 /**
  * 车辆请求类
@@ -10,6 +14,13 @@ public class VehicleRequest {
     /** 车牌号 */
     @NotBlank
     private String plateNumber;
+    /** 车架号 */
+    @NotBlank
+    @Size(min = 6, max = 32)
+    private String vin;
+    /** 发动机号 */
+    @NotBlank
+    private String engineNumber;
     /** 品牌 */
     @NotBlank
     private String brand;
@@ -21,10 +32,26 @@ public class VehicleRequest {
     private String ownerName;
     /** 联系电话 */
     @NotBlank
+    @Pattern(regexp = "^[0-9+\\- ]{6,20}$", message = "格式不正确")
     private String phone;
     /** 状态 */
     @NotBlank
     private String status;
+    /** 首次登记日期 */
+    @NotBlank
+    private String registerDate;
+    /** 年检到期日期 */
+    @NotBlank
+    private String annualInspectionDate;
+    /** 保险到期日期 */
+    @NotBlank
+    private String insuranceExpireDate;
+    /** 里程数 */
+    @NotNull
+    @PositiveOrZero
+    private Long mileage;
+    /** 备注 */
+    private String remark;
 
     /**
      * 获取车牌号
@@ -40,6 +67,22 @@ public class VehicleRequest {
      */
     public void setPlateNumber(String plateNumber) {
         this.plateNumber = plateNumber;
+    }
+
+    public String getVin() {
+        return vin;
+    }
+
+    public void setVin(String vin) {
+        this.vin = vin;
+    }
+
+    public String getEngineNumber() {
+        return engineNumber;
+    }
+
+    public void setEngineNumber(String engineNumber) {
+        this.engineNumber = engineNumber;
     }
 
     /**
@@ -120,5 +163,45 @@ public class VehicleRequest {
      */
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getRegisterDate() {
+        return registerDate;
+    }
+
+    public void setRegisterDate(String registerDate) {
+        this.registerDate = registerDate;
+    }
+
+    public String getAnnualInspectionDate() {
+        return annualInspectionDate;
+    }
+
+    public void setAnnualInspectionDate(String annualInspectionDate) {
+        this.annualInspectionDate = annualInspectionDate;
+    }
+
+    public String getInsuranceExpireDate() {
+        return insuranceExpireDate;
+    }
+
+    public void setInsuranceExpireDate(String insuranceExpireDate) {
+        this.insuranceExpireDate = insuranceExpireDate;
+    }
+
+    public Long getMileage() {
+        return mileage;
+    }
+
+    public void setMileage(Long mileage) {
+        this.mileage = mileage;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

@@ -50,6 +50,22 @@ public interface VehicleRepository {
     List<Vehicle> findByStatus(String status) throws IOException;
 
     /**
+     * 根据车牌号查询车辆。
+     * @param plateNumber 车牌号
+     * @return 车辆信息
+     * @throws IOException 查询异常
+     */
+    Optional<Vehicle> findByPlateNumber(String plateNumber) throws IOException;
+
+    /**
+     * 根据车架号查询车辆。
+     * @param vin 车架号
+     * @return 车辆信息
+     * @throws IOException 查询异常
+     */
+    Optional<Vehicle> findByVin(String vin) throws IOException;
+
+    /**
      * 根据车辆ID删除车辆
      * @param vehicleId 车辆ID
      * @throws IOException 删除异常

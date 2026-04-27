@@ -1,5 +1,6 @@
 package com.example.vehiclemanagement.controller;
 
+import com.example.vehiclemanagement.dto.ApiResponse;
 import com.example.vehiclemanagement.dto.AuthResponse;
 import com.example.vehiclemanagement.dto.LoginRequest;
 import com.example.vehiclemanagement.dto.RegisterRequest;
@@ -37,9 +38,9 @@ public class AuthController {
      * @return 注册结果
      */
     @PostMapping("/register")
-    public Map<String, Object> register(@Valid @RequestBody RegisterRequest request) {
+    public ApiResponse<Void> register(@Valid @RequestBody RegisterRequest request) {
         authService.register(request);
-        return Map.of("message", "注册成功");
+        return ApiResponse.success(null, "注册成功");
     }
 
     /**
@@ -49,10 +50,10 @@ public class AuthController {
      * @return 创建结果
      */
     @PostMapping("/register/admin")
-    public Map<String, Object> registerByAdmin(@RequestHeader("Authorization") String authorization,
-                                                @Valid @RequestBody RegisterRequest request) {
+    public ApiResponse<Void> registerByAdmin(@RequestHeader("Authorization") String authorization,
+                                             @Valid @RequestBody RegisterRequest request) {
         authService.registerByAdmin(request, authorization);
-        return Map.of("message", "创建用户成功");
+        return ApiResponse.success(null, "创建用户成功");
     }
 
     /**
@@ -61,8 +62,8 @@ public class AuthController {
      * @return 登录响应，包含令牌
      */
     @PostMapping("/login")
-    public AuthResponse login(@Valid @RequestBody LoginRequest request) {
-        return authService.login(request);
+    public ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        return ApiResponse.success(authService.login(request), "登录成功");
     }
 
     /**
@@ -71,9 +72,9 @@ public class AuthController {
      * @return 登出结果
      */
     @PostMapping("/logout")
-    public Map<String, Object> logout(@RequestHeader("Authorization") String authorization) {
+    public ApiResponse<Void> logout(@RequestHeader("Authorization") String authorization) {
         authService.logout(authorization);
-        return Map.of("message", "退出登录成功");
+        return ApiResponse.success(null, "退出登录成功");
     }
 
     /**
@@ -82,8 +83,8 @@ public class AuthController {
      * @return 当前用户信息
      */
     @GetMapping("/me")
-    public Map<String, Object> me(@RequestHeader("Authorization") String authorization) {
+    public ApiResponse<Map<String, Object>> me(@RequestHeader("Authorization") String authorization) {
         UserSession session = authService.requireUser(authorization);
-        return Map.of("username", session.getUsername(), "role", session.getRole());
+        return ApiResponse.success(Map.of("username", session.getUsername(), "role", session.getRole()));
     }
 }

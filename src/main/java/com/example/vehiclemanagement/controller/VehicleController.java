@@ -1,5 +1,8 @@
 package com.example.vehiclemanagement.controller;
 
+import com.example.vehiclemanagement.dto.ApiResponse;
+import com.example.vehiclemanagement.dto.PageResponse;
+import com.example.vehiclemanagement.dto.VehicleQueryRequest;
 import com.example.vehiclemanagement.dto.VehicleRequest;
 import com.example.vehiclemanagement.model.AuditRecord;
 import com.example.vehiclemanagement.model.Vehicle;
@@ -18,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 车辆控制器，负责车辆增删改查和审计日志查询接口。
@@ -48,10 +50,10 @@ public class VehicleController {
      * @return 添加的车辆
      */
     @PostMapping
-    public Vehicle add(@RequestHeader("Authorization") String authorization,
-                       @Valid @RequestBody VehicleRequest request) {
+    public ApiResponse<Vehicle> add(@RequestHeader("Authorization") String authorization,
+                                    @Valid @RequestBody VehicleRequest request) {
         UserSession session = authService.requireUser(authorization);
-        return vehicleService.addVehicle(request, session.getUsername());
+        return ApiResponse.success(vehicleService.addVehicle(request, session.getUsername()), "新增车辆成功");
     }
 
     /**
@@ -62,11 +64,11 @@ public class VehicleController {
      * @return 更新后的车辆
      */
     @PutMapping("/{vehicleId}")
-    public Vehicle update(@RequestHeader("Authorization") String authorization,
-                          @PathVariable String vehicleId,
-                          @Valid @RequestBody VehicleRequest request) {
+    public ApiResponse<Vehicle> update(@RequestHeader("Authorization") String authorization,
+                                       @PathVariable String vehicleId,
+                                       @Valid @RequestBody VehicleRequest request) {
         UserSession session = authService.requireUser(authorization);
-        return vehicleService.updateVehicle(vehicleId, request, session.getUsername());
+        return ApiResponse.success(vehicleService.updateVehicle(vehicleId, request, session.getUsername()), "修改车辆成功");
     }
 
     /**
@@ -76,11 +78,11 @@ public class VehicleController {
      * @return 删除结果
      */
     @DeleteMapping("/{vehicleId}")
-    public Map<String, Object> delete(@RequestHeader("Authorization") String authorization,
-                                      @PathVariable String vehicleId) {
+    public ApiResponse<Void> delete(@RequestHeader("Authorization") String authorization,
+                                    @PathVariable String vehicleId) {
         UserSession session = authService.requireAdmin(authorization);
         vehicleService.deleteVehicle(vehicleId, session.getUsername());
-        return Map.of("message", "删除成功");
+        return ApiResponse.success(null, "删除成功");
     }
 
     /**
@@ -90,10 +92,10 @@ public class VehicleController {
      * @return 车辆信息
      */
     @GetMapping("/{vehicleId}")
-    public Vehicle get(@RequestHeader("Authorization") String authorization,
-                       @PathVariable String vehicleId) {
+    public ApiResponse<Vehicle> get(@RequestHeader("Authorization") String authorization,
+                                    @PathVariable String vehicleId) {
         authService.requireUser(authorization);
-        return vehicleService.getById(vehicleId);
+        return ApiResponse.success(vehicleService.getById(vehicleId));
     }
 
     /**
@@ -104,11 +106,26 @@ public class VehicleController {
      * @return 车辆列表
      */
     @GetMapping
-    public List<Vehicle> list(@RequestHeader("Authorization") String authorization,
-                              @RequestParam(required = false) String brand,
-                              @RequestParam(required = false) String status) {
+    public ApiResponse<PageResponse<Vehicle>> list(@RequestHeader("Authorization") String authorization,
+                                                   @RequestParam(required = false) String keyword,
+                                                   @RequestParam(required = false) String brand,
+                                                   @RequestParam(required = false) String status,
+                                                   @RequestParam(required = false) String ownerName,
+                                                   @RequestParam(defaultValue = "1") int page,
+                                                   @RequestParam(defaultValue = "10") int size,
+                                                   @RequestParam(defaultValue = "updatedAt") String sortBy,
+                                                   @RequestParam(defaultValue = "desc") String sortDir) {
         authService.requireUser(authorization);
-        return vehicleService.list(brand, status);
+        VehicleQueryRequest request = new VehicleQueryRequest();
+        request.setKeyword(keyword);
+        request.setBrand(brand);
+        request.setStatus(status);
+        request.setOwnerName(ownerName);
+        request.setPage(page);
+        request.setSize(size);
+        request.setSortBy(sortBy);
+        request.setSortDir(sortDir);
+        return ApiResponse.success(vehicleService.list(request));
     }
 
     /**
@@ -118,9 +135,9 @@ public class VehicleController {
      * @return 审计日志列表
      */
     @GetMapping("/{vehicleId}/audit")
-    public List<AuditRecord> audit(@RequestHeader("Authorization") String authorization,
-                                   @PathVariable String vehicleId) {
+    public ApiResponse<List<AuditRecord>> audit(@RequestHeader("Authorization") String authorization,
+                                                @PathVariable String vehicleId) {
         authService.requireUser(authorization);
-        return vehicleService.listAudit(vehicleId);
+        return ApiResponse.success(vehicleService.listAudit(vehicleId));
     }
 }

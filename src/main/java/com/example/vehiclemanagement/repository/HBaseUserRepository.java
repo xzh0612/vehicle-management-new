@@ -65,14 +65,21 @@ public class HBaseUserRepository implements UserRepository {
     @Override
     public Optional<User> findByUsername(String username) throws IOException {
         try (Table table = connection.getTable(TableName.valueOf(properties.getTableUsers()))) {
-            Result result = table.get(new Get(Bytes.toBytes(username)));
+            Get get = new Get(Bytes.toBytes(username));
+            Result result = table.get(get);
             if (result.isEmpty()) {
                 return Optional.empty();
             }
             User user = new User();
-            user.setUsername(Bytes.toString(result.getValue(CF, Bytes.toBytes("username"))));
-            user.setPasswordHash(Bytes.toString(result.getValue(CF, Bytes.toBytes("passwordHash"))));
-            user.setRole(Bytes.toString(result.getValue(CF, Bytes.toBytes("role"))));
+            String storedUsername = Bytes.toString(result.getValue(CF, Bytes.toBytes("username")));
+            user.setUsername(storedUsername == null || storedUsername.isBlank() ? username : storedUsername);
+            byte[] passwordHash = result.getValue(CF, Bytes.toBytes("passwordHash"));
+            if (passwordHash == null) {
+                passwordHash = result.getValue(CF, Bytes.toBytes("password"));
+            }
+            user.setPasswordHash(Bytes.toString(passwordHash));
+            String role = Bytes.toString(result.getValue(CF, Bytes.toBytes("role")));
+            user.setRole(role == null || role.isBlank() ? "USER" : role);
             return Optional.of(user);
         }
     }
