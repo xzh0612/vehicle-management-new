@@ -694,10 +694,30 @@ button.ghost.danger {
     right: 24px;
     bottom: 24px;
     width: min(380px, calc(100vw - 32px));
-    padding: 18px 20px;
+    padding: 24px 20px 18px;
     border-radius: 22px;
     box-shadow: var(--glow);
     z-index: 100;
+}
+
+.toast__close {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.toast__close:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .toast.info {
