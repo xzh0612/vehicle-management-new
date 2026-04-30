@@ -49,14 +49,13 @@ export const DashboardShell = defineComponent({
         <div class="dashboard">
             <section class="dashboard-hero">
                 <div>
-                    <p class="eyebrow">Operations Deck</p>
-                    <h2>欢迎回来，{{ user.username }}</h2>
-                    <p>这里是新的 Vue 组件式工作台。我们把录入、检索、统计和审计都整理成了更稳定的交互结构。</p>
+                    <h2>车辆管理面板</h2>
+                    <p>欢迎回来，{{ user.username }}</p>
                 </div>
                 <div class="dashboard-hero__actions">
                     <span class="role-pill">{{ user.role }}</span>
-                    <button type="button" class="secondary" @click="$emit('refresh-dashboard')">刷新概览</button>
-                    <button type="button" class="danger" @click="$emit('logout')">退出登录</button>
+                    <button type="button" class="secondary" @click="$emit('refresh-dashboard')">刷新</button>
+                    <button type="button" class="danger" @click="$emit('logout')">退出</button>
                 </div>
             </section>
 
