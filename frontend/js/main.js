@@ -394,7 +394,7 @@ const app = createApp({
                 @create-user="createUser"
             />
 
-            <ToastMessage :message="state.ui.message" :type="state.ui.messageType" />
+            <ToastMessage :message="state.ui.message" :type="state.ui.messageType" @close="state.ui.message = ''" />
         </main>
     `
 });

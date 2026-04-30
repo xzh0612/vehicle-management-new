@@ -53,23 +53,38 @@ export const AuthPanel = defineComponent({
                 />
 
                 <section class="auth-card">
+                    <div class="auth-card-header">
+                        <h1>车辆管理系统</h1>
+                        <p>登录以访问管理控制台</p>
+                    </div>
+
                     <div class="auth-tabs">
                         <button :class="{ active: activeTab === 'login' }" type="button" @click="activeTab = 'login'">登录</button>
                         <button :class="{ active: activeTab === 'register' }" type="button" @click="activeTab = 'register'">注册</button>
                     </div>
 
                     <form v-if="activeTab === 'login'" class="auth-form" @submit.prevent="$emit('login')">
-                        <p class="auth-form__title">进入车辆工作台</p>
-                        <input v-model="loginForm.username" placeholder="用户名" autocomplete="username">
-                        <input v-model="loginForm.password" placeholder="密码" type="password" autocomplete="current-password">
-                        <button type="submit">进入系统</button>
+                        <div class="input-group">
+                            <label for="login-username">用户名</label>
+                            <input id="login-username" v-model="loginForm.username" placeholder="请输入用户名" autocomplete="username">
+                        </div>
+                        <div class="input-group">
+                            <label for="login-password">密码</label>
+                            <input id="login-password" v-model="loginForm.password" placeholder="请输入密码" type="password" autocomplete="current-password">
+                        </div>
+                        <button type="submit">登录</button>
                     </form>
 
                     <form v-else class="auth-form" @submit.prevent="$emit('register')">
-                        <p class="auth-form__title">创建普通用户</p>
-                        <input v-model="registerForm.username" placeholder="用户名" autocomplete="username">
-                        <input v-model="registerForm.password" placeholder="密码" type="password" autocomplete="new-password">
-                        <button type="submit" class="secondary">创建账号</button>
+                        <div class="input-group">
+                            <label for="register-username">用户名</label>
+                            <input id="register-username" v-model="registerForm.username" placeholder="请输入用户名" autocomplete="username">
+                        </div>
+                        <div class="input-group">
+                            <label for="register-password">密码</label>
+                            <input id="register-password" v-model="registerForm.password" placeholder="请输入密码" type="password" autocomplete="new-password">
+                        </div>
+                        <button type="submit" class="secondary">注册</button>
                     </form>
                 </section>
             </div>
