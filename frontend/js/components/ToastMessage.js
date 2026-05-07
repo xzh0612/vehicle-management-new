@@ -7,29 +7,41 @@ export const ToastMessage = defineComponent({
         type: { type: String, default: "info" }
     },
     emits: ["close"],
+    data() {
+        return {
+            visible: false
+        };
+    },
+    watch: {
+        message(val) {
+            if (val) {
+                this.visible = true;
+                clearTimeout(this._timer);
+                this._timer = setTimeout(() => this.doClose(), 3000);
+            }
+        }
+    },
     mounted() {
         if (this.message) {
-            this._timer = setTimeout(() => this.$emit("close"), 3000);
+            this.visible = true;
+            this._timer = setTimeout(() => this.doClose(), 3000);
         }
     },
     beforeUnmount() {
         clearTimeout(this._timer);
     },
-    watch: {
-        message(newVal) {
+    methods: {
+        doClose() {
+            this.visible = false;
             clearTimeout(this._timer);
-            if (newVal) {
-                this._timer = setTimeout(() => this.$emit("close"), 3000);
-            }
+            this.$emit("close");
         }
     },
     template: `
-        <transition name="toast-fade">
-            <section v-if="message" class="toast" :class="type">
-                <button class="toast__close" @click="$emit('close')">&times;</button>
-                <strong>系统消息</strong>
-                <p>{{ message }}</p>
-            </section>
-        </transition>
+        <section v-if="visible" class="toast" :class="type">
+            <button class="toast__close" type="button" @click="doClose">&times;</button>
+            <strong>系统消息</strong>
+            <p>{{ message }}</p>
+        </section>
     `
 });
